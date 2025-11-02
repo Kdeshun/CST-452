@@ -1,4 +1,5 @@
-# Senior-Project-
+# CST-452 Senior Project – Secure E-Commerce Web Application
+This repository contains all relevant files, documentation, and source code for my CST‑452 Senior Capstone Project, a full-stack e-commerce web application designed to simulate a real-world online shopping experience.
 All Files and Relavant Data for my CST-452 Senior Project
 
 Overview: Simple E-commerce application meant to mimic online shopping experience. 
