@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - E-Commerce Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .checkout-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .checkout-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"], input[type="tel"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Enhanced validation states */
+        .input-valid {
+            border-color: #28a745;
+            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+        }
+
+        .input-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+        }
+
+        .validation-message {
+            font-size: 14px;
+            margin-top: 5px;
+            min-height: 20px;
+        }
+
+        .validation-message.success {
+            color: #28a745;
+        }
+
+        .validation-message.error {
+            color: #dc3545;
+        }
+
+        .order-summary {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #333;
+        }
+
+        .place-order-btn {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .place-order-btn:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        .place-order-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: #545b62;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="shop.html" class="back-btn">← Back to Shop</a>
+        
+        <h1>Checkout</h1>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <h3>Loading your order...</h3>
+        </div>
+        
+        <div id="error-message" class="error" style="display: none;"></div>
+        
+        <div id="checkout-content" class="checkout-content">
+            <div class="checkout-form">
+                <h3>Shipping Information</h3>
+                <form id="checkout-form">
+                    <div class="form-group">
+                        <label for="city">City:</label>
+                        <select id="city" name="city" required>
+                            <option value="">Select your city</option>
+                            <option value="New York">New York</option>
+                            <option value="Los Angeles">Los Angeles</option>
+                            <option value="Chicago">Chicago</option>
+                            <option value="Houston">Houston</option>
+                            <option value="Phoenix">Phoenix</option>
+                            <option value="Philadelphia">Philadelphia</option>
+                            <option value="San Antonio">San Antonio</option>
+                            <option value="San Diego">San Diego</option>
+                            <option value="Dallas">Dallas</option>
+                            <option value="San Jose">San Jose</option>
+                            <option value="Austin">Austin</option>
+                            <option value="Jacksonville">Jacksonville</option>
+                            <option value="Fort Worth">Fort Worth</option>
+                            <option value="Columbus">Columbus</option>
+                            <option value="Indianapolis">Indianapolis</option>
+                            <option value="Charlotte">Charlotte</option>
+                            <option value="San Francisco">San Francisco</option>
+                            <option value="Seattle">Seattle</option>
+                            <option value="Denver">Denver</option>
+                            <option value="Boston">Boston</option>
+                        </select>
+                        <div id="city-validation" class="validation-message"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number:</label>
+                        <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" required>
+                        <div id="phone-validation" class="validation-message"></div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                <div id="order-items"></div>
+                
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span>Tax (8%):</span>
+                    <span id="tax">$0.00</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span>Shipping:</span>
+                    <span id="shipping">$5.99</span>
+                </div>
+                
+                <div class="summary-item">
+                    <span>Total:</span>
+                    <span id="total">$0.00</span>
+                </div>
+                
+                <button id="place-order-btn" class="place-order-btn" disabled>
+                    Place Order
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:5000';
+        
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to access checkout');
+            window.location.href = 'login.html';
+        }
+
+        let cartItems = [];
+        let validationState = {
+            city: false,
+            phone: false
+        };
+        
+        // Load cart data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCartData();
+            initializeValidation();
+        });
+
+        async function loadCartData() {
+            const loading = document.getElementById('loading');
+            const checkoutContent = document.getElementById('checkout-content');
+            const errorMessage = document.getElementById('error-message');
+            
+            try {
+                loading.style.display = 'block';
+                checkoutContent.style.display = 'none';
+                
+                const response = await fetch(`${API_BASE}/cart`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load cart');
+                }
+
+                const result = await response.json();
+                cartItems = result.data || result;
+                
+                if (cartItems.length === 0) {
+                    alert('Your cart is empty!');
+                    window.location.href = 'shop.html';
+                    return;
+                }
+                
+                displayOrderSummary();
+                loading.style.display = 'none';
+                checkoutContent.style.display = 'grid';
+                
+            } catch (error) {
+                console.error('Error loading cart:', error);
+                loading.style.display = 'none';
+                errorMessage.textContent = 'Error loading cart. Please try again.';
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function displayOrderSummary() {
+            const orderItemsDiv = document.getElementById('order-items');
+            let subtotal = 0;
+            
+            orderItemsDiv.innerHTML = '';
+            
+            cartItems.forEach(item => {
+                const product = item.productId || item;
+                const quantity = item.quantity || 1;
+                const price = product.price || item.price;
+                const name = product.name || item.name;
+                
+                const itemTotal = price * quantity;
+                subtotal += itemTotal;
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'summary-item';
+                itemDiv.innerHTML = `
+                    <span>${name} x ${quantity}</span>
+                    <span>$${itemTotal.toFixed(2)}</span>
+                `;
+                orderItemsDiv.appendChild(itemDiv);
+            });
+            
+            const tax = subtotal * 0.08;
+            const shipping = 5.99;
+            const total = subtotal + tax + shipping;
+            
+            document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function initializeValidation() {
+            const citySelect = document.getElementById('city');
+            const phoneInput = document.getElementById('phone');
+            
+            // City validation
+            citySelect.addEventListener('change', validateCity);
+            
+            // Phone validation with real-time formatting and validation
+            phoneInput.addEventListener('input', function(e) {
+                // Remove all non-digit characters
+                let value = e.target.value.replace(/\D/g, '');
+                
+                // Limit to 10 digits
+                if (value.length > 10) {
+                    value = value.slice(0, 10);
+                }
+                
+                // Format as (XXX) XXX-XXXX
+                if (value.length >= 6) {
+                    value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6)}`;
+                } else if (value.length >= 3) {
+                    value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+                } else if (value.length > 0) {
+                    value = `(${value}`;
+                }
+                
+                e.target.value = value;
+                validatePhone();
+            });
+            
+            phoneInput.addEventListener('keydown', function(e) {
+                // Allow backspace, delete, tab, escape, enter
+                if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+                    // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                    (e.keyCode === 65 && e.ctrlKey === true) ||
+                    (e.keyCode === 67 && e.ctrlKey === true) ||
+                    (e.keyCode === 86 && e.ctrlKey === true) ||
+                    (e.keyCode === 88 && e.ctrlKey === true)) {
+                    return;
+                }
+                
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        function validateCity() {
+            const citySelect = document.getElementById('city');
+            const cityValidation = document.getElementById('city-validation');
+            
+            const isValid = citySelect.value !== '';
+            validationState.city = isValid;
+            
+            if (citySelect.value === '') {
+                citySelect.classList.remove('input-valid', 'input-invalid');
+                cityValidation.textContent = '';
+                cityValidation.className = 'validation-message';
+            } else {
+                citySelect.classList.remove('input-invalid');
+                citySelect.classList.add('input-valid');
+                cityValidation.textContent = '✓ City selected';
+                cityValidation.className = 'validation-message success';
+            }
+            
+            updateSubmitButton();
+        }
+
+        function validatePhone() {
+            const phoneInput = document.getElementById('phone');
+            const phoneValidation = document.getElementById('phone-validation');
+            
+            // Get only digits from the formatted phone number
+            const digits = phoneInput.value.replace(/\D/g, '');
+            const isValid = digits.length === 10;
+            validationState.phone = isValid;
+            
+            if (digits.length === 0) {
+                phoneInput.classList.remove('input-valid', 'input-invalid');
+                phoneValidation.textContent = '';
+                phoneValidation.className = 'validation-message';
+            } else if (digits.length < 10) {
+                phoneInput.classList.remove('input-valid');
+                phoneInput.classList.add('input-invalid');
+                phoneValidation.textContent = `Phone number must be 10 digits (${digits.length}/10)`;
+                phoneValidation.className = 'validation-message error';
+            } else if (digits.length === 10) {
+                phoneInput.classList.remove('input-invalid');
+                phoneInput.classList.add('input-valid');
+                phoneValidation.textContent = '✓ Valid phone number';
+                phoneValidation.className = 'validation-message success';
+            }
+            
+            updateSubmitButton();
+        }
+
+        function updateSubmitButton() {
+            const placeOrderBtn = document.getElementById('place-order-btn');
+            const allValid = validationState.city && validationState.phone;
+            
+            placeOrderBtn.disabled = !allValid;
+            
+            if (allValid) {
+                placeOrderBtn.style.backgroundColor = '#007bff';
+                placeOrderBtn.textContent = 'Place Order';
+            } else {
+                placeOrderBtn.style.backgroundColor = '#ccc';
+                placeOrderBtn.textContent = 'Complete shipping information';
+            }
+        }
+
+        // Place order functionality
+        document.getElementById('place-order-btn').addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.textContent;
+            
+            // Final validation check
+            if (!validationState.city || !validationState.phone) {
+                alert('Please complete all shipping information correctly.');
+                return;
+            }
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Processing Order...';
+                btn.style.backgroundColor = '#ccc';
+                
+                const city = document.getElementById('city').value;
+                const phone = document.getElementById('phone').value;
+                
+                const orderData = {
+                    shippingInfo: {
+                        city: city,
+                        phone: phone
+                    }
+                };
+                
+                const response = await fetch(`${API_BASE}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to place order');
+                }
+                
+                const order = await response.json();
+                
+                // Redirect to confirmation page with order ID
+                window.location.href = `confirmation.html?orderId=${order.orderId}`;
+                
+            } catch (error) {
+                console.error('Error placing order:', error);
+                alert('Failed to place order. Please try again.');
+                btn.disabled = false;
+                btn.textContent = originalText;
+                btn.style.backgroundColor = '#007bff';
+                updateSubmitButton(); // Restore proper button state
+            }
+        });
+    </script>
+</body>
+</html>

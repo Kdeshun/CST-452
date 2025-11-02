@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - E-Commerce Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .order-id {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .order-details {
+            text-align: left;
+            margin: 30px 0;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #333;
+        }
+
+        .items-list {
+            margin-top: 15px;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .buttons {
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 5px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .estimated-delivery {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #0056b3;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .buttons {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .btn {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" class="loading" style="display: none;">
+            <h3>Loading order details...</h3>
+        </div>
+        
+        <div id="error-message" class="error" style="display: none;"></div>
+        
+        <div id="confirmation-content" style="display: none;">
+            <div class="success-icon">✓</div>
+            
+            <h1>Order Confirmed!</h1>
+            
+            <p>Thank you for your purchase. Your order has been successfully placed.</p>
+            
+            <div class="order-id">
+                Order ID: <span id="order-id"></span>
+            </div>
+            
+            <div class="estimated-delivery">
+                <strong>Estimated Delivery:</strong> 3-5 business days
+            </div>
+            
+            <div class="order-details">
+                <h3>Order Summary</h3>
+                <div id="order-items" class="items-list"></div>
+                
+                <div class="detail-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span>Tax (8%):</span>
+                    <span id="tax">$0.00</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span>Shipping:</span>
+                    <span id="shipping">$5.99</span>
+                </div>
+                
+                <div class="detail-row">
+                    <span>Total:</span>
+                    <span id="total">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="order-details">
+                <h3>Shipping Information</h3>
+                <p><strong>City:</strong> <span id="shipping-city"></span></p>
+                <p><strong>Phone:</strong> <span id="shipping-phone"></span></p>
+                <p><strong>Payment Method:</strong> <span id="payment-method"></span></p>
+            </div>
+            
+            <div class="buttons">
+                <a href="shop.html" class="btn btn-primary">Continue Shopping</a>
+                <button onclick="window.print()" class="btn btn-secondary">Print Receipt</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Please login to view order confirmation');
+            window.location.href = 'login.html';
+        }
+
+        // Get order ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+
+        if (!orderId) {
+            document.getElementById('error-message').textContent = 'No order ID provided';
+            document.getElementById('error-message').style.display = 'block';
+        } else {
+            loadOrderDetails(orderId);
+        }
+
+        async function loadOrderDetails(orderId) {
+            const loading = document.getElementById('loading');
+            const confirmationContent = document.getElementById('confirmation-content');
+            const errorMessage = document.getElementById('error-message');
+            
+            try {
+                loading.style.display = 'block';
+                
+                const response = await fetch(`http://localhost:5000/orders/${orderId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load order details');
+                }
+
+                const result = await response.json();
+                console.log('Full API response:', result); // Debug log
+                
+                
+                const order = result.data;
+                displayOrderDetails(order);
+                
+                loading.style.display = 'none';
+                confirmationContent.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading order:', error);
+                loading.style.display = 'none';
+                errorMessage.textContent = 'Error loading order details. Please try again.';
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function displayOrderDetails(order) {
+            console.log('Displaying order:', order); // Debug log to see the data structure
+            
+            // Display order ID
+            document.getElementById('order-id').textContent = order.orderId || 'N/A';
+            
+            // Display order items - FIXED: Handle the correct items structure
+            const orderItemsDiv = document.getElementById('order-items');
+            orderItemsDiv.innerHTML = '';
+            
+            if (order.items && Array.isArray(order.items) && order.items.length > 0) {
+                order.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'item';
+                    
+                    // Handle both possible item structures
+                    const itemName = item.name || (item.productId && item.productId.name) || 'Unknown Item';
+                    const itemPrice = item.price || (item.productId && item.productId.price) || 0;
+                    const itemQuantity = item.quantity || 1;
+                    const itemTotal = itemPrice * itemQuantity;
+                    
+                    itemDiv.innerHTML = `
+                        <span>${itemName} x ${itemQuantity}</span>
+                        <span>$${itemTotal.toFixed(2)}</span>
+                    `;
+                    orderItemsDiv.appendChild(itemDiv);
+                });
+            } else {
+                // Show message if no items found
+                const noItemsDiv = document.createElement('div');
+                noItemsDiv.innerHTML = '<p style="color: #666; font-style: italic;">No items found in this order.</p>';
+                orderItemsDiv.appendChild(noItemsDiv);
+                console.warn('Order items not found or empty:', order.items);
+            }
+            
+            // Display order summary - FIXED: Handle the correct summary structure
+            if (order.orderSummary) {
+                document.getElementById('subtotal').textContent = `$${(order.orderSummary.subtotal || 0).toFixed(2)}`;
+                document.getElementById('tax').textContent = `$${(order.orderSummary.tax || 0).toFixed(2)}`;
+                document.getElementById('shipping').textContent = `$${(order.orderSummary.shipping || 0).toFixed(2)}`;
+                document.getElementById('total').textContent = `$${(order.orderSummary.total || 0).toFixed(2)}`;
+            } else {
+                // Fallback values if orderSummary is missing
+                document.getElementById('subtotal').textContent = '$0.00';
+                document.getElementById('tax').textContent = '$0.00';
+                document.getElementById('shipping').textContent = '$5.99';
+                document.getElementById('total').textContent = '$5.99';
+                console.warn('Order summary not found:', order.orderSummary);
+            }
+            
+            // Display shipping information - FIXED: Handle the correct shipping structure
+            if (order.shippingInfo) {
+                document.getElementById('shipping-city').textContent = order.shippingInfo.city || 'N/A';
+                document.getElementById('shipping-phone').textContent = order.shippingInfo.phone || 'N/A';
+            } else {
+                document.getElementById('shipping-city').textContent = 'N/A';
+                document.getElementById('shipping-phone').textContent = 'N/A';
+                console.warn('Shipping info not found:', order.shippingInfo);
+            }
+            
+            // FIXED: Handle payment method - Show appropriate message for simplified checkout
+            if (order.paymentInfo && order.paymentInfo.method) {
+                document.getElementById('payment-method').textContent = formatPaymentMethod(order.paymentInfo.method);
+            } else {
+                
+                document.getElementById('payment-method').textContent = 'Pay on Delivery';
+            }
+        }
+
+        function formatPaymentMethod(method) {
+            const methods = {
+                'credit-card': 'Credit Card',
+                'paypal': 'PayPal',
+                'apple-pay': 'Apple Pay'
+            };
+            return methods[method] || method;
+        }
+    </script>
+</body>
+</html>
